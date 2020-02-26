@@ -122,7 +122,33 @@ function main() {
     // Nå består hvert punkt/vertex av tre tall:
     let vertices = logoCoordinates.length / 3;
 
-    gl.drawArrays(gl.TRIANGLES, 0, vertices);
+    // Vi lager en funksjon som beskriver hva som må tegnes for hvert bilde.
+    // Argumentet "tid" blir satt til antallet millisekunder som har gått siden
+    // vi åpnet siden. 
+    function update(tid) {
+        // Vi ønsker at modellen skal rotere 90 grader i sekundet.
+        // For hvert bilde regner vi ut en ny transformasjonsmatrise,
+        var fart = 90.0;
+        var vinkel = fart * (tid / 1000.0) * (Math.PI/180);
+        glMatrix.mat4.fromZRotation(transformationMatrix, vinkel);
+
+        // sender den inn til shaderprogrammet,
+        gl.uniformMatrix4fv(transformationMatrixLocation, false, transformationMatrix);
+
+        // visker ut det forrige bildet,
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // og tegner den oppdaterte figuren.
+        gl.drawArrays(gl.TRIANGLES, 0, vertices);
+
+        // Etter slutten av hvert bilde er vi nødt til å signalisere
+        // at vi ønsker å fortsette animasjonen:
+        requestAnimationFrame(update);
+    }
+
+    // Start animasjonen:
+    requestAnimationFrame(update);
 }
 
 window.onload = main;
