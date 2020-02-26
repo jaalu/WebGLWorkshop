@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Utviklerdag WebGL</title>
+    <style>
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<!-- To use WebGL, we need a canvas element: -->
+<body>
+    <div class="container">
+        <canvas id="mainCanvas" width="800" height="600"></canvas>
+    </div>
+
+    <!-- We use the glMatrix library http://glmatrix.net/ -->
+    <script type="text/javascript" src="gl-matrix.js"></script>
+
+    <!-- Import the DIPS logo model: -->
+    <script type="text/javascript" src="logo.js"></script>
+    
+    <!-- main.js is run when the page finishes loading. -->
+    <script type="text/javascript" src="main.js"></script>
+</body>
+
+
+</html>
