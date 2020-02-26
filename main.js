@@ -68,11 +68,7 @@ function main() {
     // Vi lager et sett med koordinater som skal videresendes til GPUen.
     // Hvert koordinat kommer inn i vertex-shaderen.
     
-    let coordinates = new Float32Array([
-        0.0, 0.5,
-        0.5, -0.5,
-        -0.5, -0.5
-    ]);
+    let coordinates = logoCoordinates;
 
     // For å levere data fra prosessoren til skjermkortet bruker vi et buffer:
     let positionBuffer = gl.createBuffer();
@@ -90,7 +86,7 @@ function main() {
     // dataene i positionBuffer skal tolkes om til verdier som kan
     // settes inn i inputPosition:
     gl.enableVertexAttribArray(inputPositionLocation);
-    let components = 2; // Hent ut to tall - et koordinat - for hver runde vi kjører vertex-shaderen
+    let components = 3; // Hent ut tre tall - et 3D-koordinat - for hver runde vi kjører vertex-shaderen
     let bufferType = gl.FLOAT; // Bufferet består av floats
     let normalized = false; // Ikke gjør om til floats
     let stride = 0; // Anta at verdiene ligger like etter hverandre i bufferet 
@@ -104,8 +100,8 @@ function main() {
     // og tegne opp trekanten vår:
     gl.useProgram(shaderProgram);
 
-    // Modellen består av tre punkter / vertices:
-    let vertices = 3;
+    // Nå består hvert punkt/vertex av tre tall:
+    let vertices = logoCoordinates.length / 3;
 
     // TODO: Prøv å erstatte gl.TRIANGLES med gl.LINE_LOOP!
     gl.drawArrays(gl.TRIANGLES, 0, vertices);
