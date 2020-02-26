@@ -2,8 +2,14 @@
 const vertexShaderSource = `
 attribute vec4 inputPosition;
 
+// Vi lagrer rotasjonen vi skal sette på hvert punkt 
+// i en transformasjonsmatrise:
+uniform mat4 transformationMatrix;
+
 void main() {
-    gl_Position = inputPosition;
+    // For å utføre transformasjonen, multipliserer vi denne matrisen 
+    // med vektoren for koordinatet:
+    gl_Position = transformationMatrix * inputPosition;
 }
 `;
 
@@ -11,7 +17,6 @@ void main() {
 const fragmentShaderSource = `
 precision mediump float;
 void main() {
-    // TODO: Prøv å endre på tallene her:
     gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
 `
@@ -67,7 +72,6 @@ function main() {
 
     // Vi lager et sett med koordinater som skal videresendes til GPUen.
     // Hvert koordinat kommer inn i vertex-shaderen.
-    
     let coordinates = logoCoordinates;
 
     // For å levere data fra prosessoren til skjermkortet bruker vi et buffer:
@@ -82,6 +86,9 @@ function main() {
     // variabelen inputPosition (se øverst):
     let inputPositionLocation = gl.getAttribLocation(shaderProgram, "inputPosition");
 
+    // Nå må vi finne ut hvor transformasjonsmatrisen skal inn:
+    let transformationMatrixLocation = gl.getUniformLocation(shaderProgram, "transformationMatrix");
+
     // Vi bruker vertexAttribPointer for å beskrive hvordan
     // dataene i positionBuffer skal tolkes om til verdier som kan
     // settes inn i inputPosition:
@@ -94,16 +101,27 @@ function main() {
     gl.vertexAttribPointer(inputPositionLocation, 
         components, bufferType, normalized, stride, offset);
 
+    // Vi lager en matrise som roterer logoen.
+    // Vi bruker metoden fromZRotation (se http://glmatrix.net/docs/module-mat4.html)
+    // for å lage en matrise som snur punkter rundt Z-aksen (mot skjermen):
+    let transformationMatrix = glMatrix.mat4.create();
+    let vinkel = 45.0 * (Math.PI/180); // Snu logoen 45 grader (må gjøres om til radianer)
+
+    // TODO: Prøv å bytte ut fromZRotation med fromXRotation eller fromYRotation
+    glMatrix.mat4.fromZRotation(transformationMatrix, vinkel);
+
     // Når vi har kompilert shaderne, satt sammen programmet,
     // og fortalt det hvor det skal hente data,
     // kan vi be WebGL om å aktivere programmet,
     // og tegne opp trekanten vår:
     gl.useProgram(shaderProgram);
 
+    // Vi setter transformasjonsmatrisen som skal brukes når shaderprogrammet kjøres:
+    gl.uniformMatrix4fv(transformationMatrixLocation, false, transformationMatrix);
+
     // Nå består hvert punkt/vertex av tre tall:
     let vertices = logoCoordinates.length / 3;
 
-    // TODO: Prøv å erstatte gl.TRIANGLES med gl.LINE_LOOP!
     gl.drawArrays(gl.TRIANGLES, 0, vertices);
 }
 
